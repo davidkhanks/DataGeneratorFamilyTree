@@ -7,9 +7,7 @@
 package com.fhd.datageneratorfamilytree;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import static org.familysearch.api.client.util.FamilySearchOptions.reason;
 import org.gedcomx.conclusion.Fact;
@@ -18,7 +16,7 @@ import org.gedcomx.conclusion.NamePart;
 import org.gedcomx.conclusion.Person;
 import org.gedcomx.rs.client.PersonState;
 import org.gedcomx.types.FactType;
-import org.gedcomx.types.GenderType;
+//import org.gedcomx.types.GenderType;
 import org.gedcomx.types.NamePartType;
 //import org.gedcomx.common.json.*;
 //import org.gedcomx.conclusion.json.*;
@@ -91,22 +89,28 @@ public class PersonCreator {
      * @param pi The PersonInfo obj that holds the information needed to make the call to create a new person in the tree
      */
     public void pushToWeb(FamilySearchFamilyTree ft, PersonInfo pi) {
-        PersonState person = ft.addPerson(new Person()
-                //Use the name of the person info object; the .preferred(true) needs to be used or the call will not work
-                .name(new Name(pi.getFullName(), new NamePart(NamePartType.Given, pi.getGivenName()), new NamePart(NamePartType.Surname, pi.getSurName())).preferred(true))
-                //Get the GenderType from the PersonInfo obj depending on the gender string
-                .gender(pi.getGenderType())
-                //born "dd Month yyyy"
-                .fact(new Fact(FactType.Birth, pi.getFullBirthDate(), pi.getBirthPlace()))
-                //died in "dd Month yyyy"
-                .fact(new Fact(FactType.Death, pi.getFullDeathDate(), pi.getDeathPlace())).living(false),
-                //with a message as to why
-                reason(pi.getReason())
-            ).ifSuccessful();
-        //this will set the Uri of the PersonInfo object to the Uri that is returned from this call.
-        //That way we can print it out later to use it for manual lookup, etc
-        pi.setUri(person.getSelfUri());
-            
+        try {
+            PersonState person = ft.addPerson(new Person()
+                    //Use the name of the person info object; the .preferred(true) needs to be used or the call will not work
+                    .name(new Name(pi.getFullName(), new NamePart(NamePartType.Given, pi.getGivenName()), new NamePart(NamePartType.Surname, pi.getSurName())).preferred(true))
+                    //Get the GenderType from the PersonInfo obj depending on the gender string
+                    .gender(pi.getGenderType())
+                    //born "dd Month yyyy"
+                    .fact(new Fact(FactType.Birth, pi.getFullBirthDate(), pi.getBirthPlace()))
+                    //died in "dd Month yyyy"
+                    .fact(new Fact(FactType.Death, pi.getFullDeathDate(), pi.getDeathPlace())).living(false),
+                    //with a message as to why
+                    reason(pi.getReason())
+                ).ifSuccessful();
+            //this will set the Uri of the PersonInfo object to the Uri that is returned from this call.
+            //That way we can print it out later to use it for manual lookup, etc
+            pi.setUri(person.getSelfUri());
+        System.out.println("Retreived URI for " + pi.getFullName() + ": " + pi.getUri());
+        } catch(Exception e) {
+            e.printStackTrace();
+        } 
+        
+       
         
     }
 }
