@@ -29,6 +29,9 @@ import org.gedcomx.types.NamePartType;
 public class PersonCreator {
     
     private List<PersonInfo> persons = new ArrayList();
+    private long startTime = System.currentTimeMillis();
+    private long endTime;
+    private long currentTime;
     
     /**
      * Constructor
@@ -83,6 +86,13 @@ public class PersonCreator {
         return persons.get(index);
     }
     
+    public long getCurrentRunTime() {
+        endTime = System.currentTimeMillis();
+        currentTime = endTime - startTime;
+        
+        return currentTime;
+    }
+    
     /**
      * Call the API endpoint and pass it the information necessary to create a person on the tree
      * @param ft the FamilySearchFamilyTree obj used to make the connection to the endpoint
@@ -106,6 +116,9 @@ public class PersonCreator {
             //That way we can print it out later to use it for manual lookup, etc
             pi.setUri(person.getSelfUri());
         System.out.println("Retreived URI for " + pi.getFullName() + ": " + pi.getUri());
+        System.out.println("Current run time: " + this.getCurrentRunTime());
+        
+        
         } catch(Exception e) {
             e.printStackTrace();
         } 
