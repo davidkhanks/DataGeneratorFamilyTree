@@ -185,7 +185,7 @@ public class TreeGenerator {
         
         //Call the recursive function passing in the number of generations to create, the node to start with, 
         //the Person creator to use, and the FamilySearchFamilyTree object to use for hitting the endpoint
-        populateTree(2, basePerson, pc, ft);
+        populateTree(1, basePerson, pc, ft);
         
         //Print out the names of all people in the newly created tree, their parents, and respective URI's to make it easy to find them in the tree
         printTree(basePerson);
@@ -300,7 +300,7 @@ public class TreeGenerator {
             System.out.println("Child relationship for: " + base.getPerson().getFullName());
             System.out.println("\tFather: " + base.getFather().getPerson().getFullName());
             System.out.println("\tMother: " + base.getMother().getPerson().getFullName());
-            System.out.println("Current run time: " + pc.getCurrentRunTime());
+            System.out.println("Current run time: " + pc.getCurrentRunTime() + "ms");
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -311,7 +311,7 @@ public class TreeGenerator {
             System.out.println("Marriage relationship: " );
             System.out.println("\tHusband: " + base.getFather().getPerson().getFullName());
             System.out.println("\tWife: " + base.getMother().getPerson().getFullName());
-            System.out.println("Current run time: " + pc.getCurrentRunTime());
+            System.out.println("Current run time: " + pc.getCurrentRunTime() + "ms");
         } catch(Exception e) {
             e.printStackTrace();
         }

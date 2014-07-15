@@ -32,6 +32,7 @@ public class PersonCreator {
     private long startTime = System.currentTimeMillis();
     private long endTime;
     private long currentTime;
+    private int count = 0;
     
     /**
      * Constructor
@@ -86,11 +87,26 @@ public class PersonCreator {
         return persons.get(index);
     }
     
+    /**
+     * Gets the time since the PersonCreator object was instantiated
+     * @return currentTime the current run time of the project
+     */
     public long getCurrentRunTime() {
         endTime = System.currentTimeMillis();
         currentTime = endTime - startTime;
         
         return currentTime;
+    }
+    
+    /**
+     * @return the count
+     */
+    public int getCount() {
+        return count;
+    }
+    
+    public void incrementCount() {
+        this.count = this.count + 1;
     }
     
     /**
@@ -115,8 +131,9 @@ public class PersonCreator {
             //this will set the Uri of the PersonInfo object to the Uri that is returned from this call.
             //That way we can print it out later to use it for manual lookup, etc
             pi.setUri(person.getSelfUri());
-        System.out.println("Retreived URI for " + pi.getFullName() + ": " + pi.getUri());
-        System.out.println("Current run time: " + this.getCurrentRunTime());
+            this.incrementCount();
+        System.out.println(this.getCount() + ". Retreived URI for " + pi.getFullName() + ": " + pi.getUri());
+        System.out.println("Current run time: " + this.getCurrentRunTime() + "ms");
         
         
         } catch(Exception e) {
@@ -126,4 +143,6 @@ public class PersonCreator {
        
         
     }
+
+    
 }
