@@ -12,23 +12,23 @@ package com.fhd.datageneratorfamilytree;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-//import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-//import org.familysearch.api.client.PersonMatchResultsState;
+import java.util.Map;
 import org.familysearch.api.client.ft.ChildAndParentsRelationshipState;
 import org.familysearch.api.client.ft.FamilySearchFamilyTree;
 import static org.familysearch.api.client.util.FamilySearchOptions.reason;
-//import org.gedcomx.atom.Entry;
-//import org.gedcomx.common.URI;
-//import org.gedcomx.conclusion.Fact;
-//import org.gedcomx.conclusion.Name;
-//import org.gedcomx.conclusion.NamePart;
-//import org.gedcomx.conclusion.Person;
-//import org.gedcomx.rs.client.PersonSearchResultsState;
+import org.gedcomx.conclusion.Fact;
+import org.gedcomx.conclusion.Name;
+import org.gedcomx.conclusion.NamePart;
+import org.gedcomx.conclusion.Person;
 import org.gedcomx.rs.client.PersonState;
 import org.gedcomx.rs.client.RelationshipState;
+import org.gedcomx.types.FactType;
+import org.gedcomx.types.GenderType;
+import org.gedcomx.types.NamePartType;
 //import org.gedcomx.rs.client.util.GedcomxPersonSearchQueryBuilder;
 //import org.gedcomx.types.FactType;
 //import org.gedcomx.types.GenderType;
@@ -70,9 +70,9 @@ public class TreeGenerator {
         //Get the username and the the string representations of where the csv names files are located 
         //in the file system
         String user = System.getProperty("user.name");
-        String surnamesFile = "/Users/" + user + "/Desktop/surnames.csv";
-        String girlsNamesFile = "/Users/" + user + "/Desktop/girls_names.csv";
-        String boysNamesFile = "/Users/" + user + "/Desktop/boys_names.csv";
+        String surnamesFile = "src/main/resources/surnames.csv";
+        String girlsNamesFile = "src/main/resources/girls_names.csv";
+        String boysNamesFile = "src/main/resources/boys_names.csv";
         
         //Read in the three files into lists of names
         BufferedReader br = null;
@@ -122,7 +122,6 @@ public class TreeGenerator {
         
         
         
-        
         //Credentials for authenticating and hitting the endpoint
         boolean useSandbox = false; //whether to use the sandbox reference or not; false will pass the beta URI to the constructor
         String username = "tum000504001";
@@ -147,48 +146,50 @@ public class TreeGenerator {
             .authenticateViaOAuth2Password(username, password, DougKey);
         }
         
-        PersonState person = ft.readPersonById(lookUpPID);
-        System.out.println(person.getName().getNameForms().get(0).getFullText());
+//        PersonState person = ft.readPersonById(lookUpPID);
+//        System.out.println(person.getName().getNameForms().get(0).getFullText());
         //This instantiates a peron creator object which deals with PersonInfo objects and 
         //encapsulates methods from the FamilySearch SDK that is being used.
-        PersonCreator pc = new PersonCreator();
+//        PersonCreator pc = new PersonCreator();
         //Make the initial person and spouse
-        pc.createPerson("Anastasia", "Baggins", "Female", "3", "Apr", "1836", "Eagle Point, Oregon", "7", "February", "1900", "Beaverton, Oregon", "This is the starting person" );
-        pc.createPerson("Edward", "Banks", "Male", "3", "Apr", "1836", "Eagle Point, Oregon", "7", "February", "1900", "Beaverton, Oregon", "This is the starting spouse" );
-        
-        List<PersonInfo> people = pc.getPersons();
-        
-        //Create a nodes for the two starting people so that we can create a recursive function
-        //to make new generations
-        TreeNode basePerson = new TreeNode(people.get(0));
-        TreeNode baseSpouse = new TreeNode(people.get(1));
-        basePerson.setSpouse(baseSpouse);
-        baseSpouse.setSpouse(basePerson);
-        
-        
-        
-        //Hit the endpoint to create the base two people in sandbox.familysearch.org
-        pc.pushToWeb(ft, people.get(0));
-        pc.pushToWeb(ft, people.get(1));
+//        pc.createPerson("Girlsname", "LastName", "Female", "3", "Apr", "1836", "Eagle Point, Oregon", "7", "February", "1900", "Beaverton, Oregon", "This is the starting person" );
+//        pc.createPerson("Edward", "Banks", "Male", "3", "Apr", "1836", "Eagle Point, Oregon", "7", "February", "1900", "Beaverton, Oregon", "This is the starting spouse" );
+//        
+//        List<PersonInfo> people = pc.getPersons();
+//        
+//        //Create a nodes for the two starting people so that we can create a recursive function
+//        //to make new generations
+//        TreeNode basePerson = new TreeNode(people.get(0));
+//        TreeNode baseSpouse = new TreeNode(people.get(1));
+//        basePerson.setSpouse(baseSpouse);
+//        baseSpouse.setSpouse(basePerson);
+//        
+//        
+//        
+//        //Hit the endpoint to create the base two people in sandbox.familysearch.org
+//        pc.pushToWeb(ft, people.get(0));
+//        pc.pushToWeb(ft, people.get(1));
         
         //Hit the endpoint to create the couple relationship in sandbox.familysearch.org
         //These two people must have had pushToWeb called so that they will have a Uri
         //Otherwise the husband and wife PersonState objects will be null and no relationship will be made. 
-        try {
-            PersonState wife = ft.readPerson(basePerson.getPerson().getUri()).ifSuccessful();
-            PersonState husband = ft.readPerson(baseSpouse.getPerson().getUri()).ifSuccessful();
-            RelationshipState coupleRelationship = ft.addSpouseRelationship(husband, wife, reason("Starting couple")).ifSuccessful();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            PersonState wife = ft.readPerson(basePerson.getPerson().getUri()).ifSuccessful();
+//            PersonState husband = ft.readPerson(baseSpouse.getPerson().getUri()).ifSuccessful();
+//            RelationshipState coupleRelationship = ft.addSpouseRelationship(husband, wife, reason("Starting couple")).ifSuccessful();
+//        } catch(Exception e) {
+//            e.printStackTrace();
+//        }
+        
+        createPerson(ft, true, "1", "September", "1900", "Eagle Point, Oregon", "1", "January", "2000", "Beaverton, Oregon", "This is simply a test");
         
         
         //Call the recursive function passing in the number of generations to create, the node to start with, 
         //the Person creator to use, and the FamilySearchFamilyTree object to use for hitting the endpoint
-        populateTree(1, basePerson, pc, ft);
+//        populateTree(2, basePerson, pc, ft);
         
         //Print out the names of all people in the newly created tree, their parents, and respective URI's to make it easy to find them in the tree
-        printTree(basePerson);
+//        printTree(basePerson);
 
     }
     
@@ -219,6 +220,82 @@ public class TreeGenerator {
         return date;
     }
     
+    public String getFirstName(boolean male) {
+        String name;
+        
+        if(male){
+            name = boysNames.get(0 + (int)(Math.random() * (((boysNames.size()-1) - 0) + 1)));
+        }else {
+            name = girlsNames.get(0 + (int)(Math.random() * (((girlsNames.size()-1) - 0) + 1)));
+        }
+        name = name.replace("\"", "");
+        return name;
+    }
+    
+    public String getSurName() {
+        String name = surnames.get(0 + (int)(Math.random() * (((surnames.size()-1) - 0) + 1)));
+        return name;
+    }
+    
+     public GenderType getGenderType(String gender) {
+        if(gender == "Male") {
+            return GenderType.Male;
+        } else {
+            return GenderType.Female;
+        }
+    }
+    
+    
+    public Map<String, String> createPerson(FamilySearchFamilyTree ft, boolean male, 
+            String birthDate, String birthMonth, String birthYear, String birthPlace, 
+            String deathDate, String deathMonth, String deathYear, String deathPlace, String reason) {
+          
+        String gender;   
+        if(male) {
+            gender = "Male";
+        }else {
+            gender = "Female";
+        }
+        
+        String given = getFirstName(male);
+        String surName = getSurName();
+        
+        try{
+            PersonState person = ft.addPerson(new Person()
+                    //Use the name of the person info object; the .preferred(true) needs to be used or the call will not work
+                    .name(new Name(given + " " + surName, new NamePart(NamePartType.Given, given), new NamePart(NamePartType.Surname, surName)).preferred(true))
+                    //Get the GenderType from the PersonInfo obj depending on the gender string
+                    .gender(getGenderType(gender))
+                    //born "dd Month yyyy"
+                    .fact(new Fact(FactType.Birth, birthDate + " " + birthMonth + " " + birthYear, birthPlace))
+                    //died in "dd Month yyyy"
+                    .fact(new Fact(FactType.Death, deathDate + " " + deathMonth + " " + deathYear, deathPlace)).living(false),
+                    //with a message as to why
+                    reason(reason)
+                ).ifSuccessful();
+            System.out.println(person.getSelfUri());
+            
+            PersonState readPerson = ft.readPerson(person.getSelfUri());
+            System.out.println(readPerson.getName().getNameForms().get(0).getFullText());
+            System.out.println(readPerson.getName().getNameForms().get(0).getParts().get(0).getValue());
+            System.out.println(readPerson.getName().getNameForms().get(0).getParts().get(1).getValue());
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+//        person.getName().getNameForm().getParts().get(0).getValue();
+        
+
+        Map<String, String> personMap = new HashMap();
+//        person.put("firstName", null);
+//        person.put("lastName", null);
+//        person.put("", null);
+//        person.put("", null);
+//        person.put("", null);
+//        person.put("", null);
+        return personMap;
+    }
+    
+    
     /**
      * Recursively generates a pedigree, given a person to start with and the number of generations to run
      * @param count the number of generations that are desired
@@ -234,13 +311,14 @@ public class TreeGenerator {
             return;
         }
         
+        
         //Get random first names for the father and the mother, use the same last name for the father,
         //get a random last name for the mother.
-        String fatherFirst = boysNames.get(0 + (int)(Math.random() * ((719 - 0) + 1)));
+        String fatherFirst = getFirstName(true);
         fatherFirst = fatherFirst.replace("\"", "");
-        String motherFirst = girlsNames.get(0 + (int)(Math.random() * ((719 - 0) + 1)));
+        String motherFirst = getFirstName(false);
         motherFirst = motherFirst.replace("\"", "");
-        String surname = surnames.get(0 + (int)(Math.random() * ((1000 - 0) + 1)));
+        String surname = getSurName();
         
         //Get the month and date for use in birth and death dates
         String month = getRandMonth();
