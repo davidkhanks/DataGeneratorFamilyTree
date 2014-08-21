@@ -134,7 +134,7 @@ public class TreeGenerator {
         String lookUpPID = "LV4V-6MY";
         boolean startWithHusband = false;
         
-        //Instantiated a FamilySearchFamilyTree obj. This establishes a connection and allows the endpoint to be hit for 
+        //Instantiated a FamilySearchFamilyTree obj. This establishes authentication and allows the endpoint to be hit for 
         //creating various people and types of relationships/add artifacts, etc
         FamilySearchFamilyTree ft;
         
@@ -148,45 +148,10 @@ public class TreeGenerator {
         
 //        PersonState person = ft.readPersonById(lookUpPID);
 //        System.out.println(person.getName().getNameForms().get(0).getFullText());
-        //This instantiates a peron creator object which deals with PersonInfo objects and 
-        //encapsulates methods from the FamilySearch SDK that is being used.
-//        PersonCreator pc = new PersonCreator();
-        //Make the initial person and spouse
-//        pc.createPerson("Girlsname", "LastName", "Female", "3", "Apr", "1836", "Eagle Point, Oregon", "7", "February", "1900", "Beaverton, Oregon", "This is the starting person" );
-//        pc.createPerson("Edward", "Banks", "Male", "3", "Apr", "1836", "Eagle Point, Oregon", "7", "February", "1900", "Beaverton, Oregon", "This is the starting spouse" );
-//        
-//        List<PersonInfo> people = pc.getPersons();
-//        
-//        //Create a nodes for the two starting people so that we can create a recursive function
-//        //to make new generations
-//        TreeNode basePerson = new TreeNode(people.get(0));
-//        TreeNode baseSpouse = new TreeNode(people.get(1));
-//        basePerson.setSpouse(baseSpouse);
-//        baseSpouse.setSpouse(basePerson);
-//        
-//        
-//        
-//        //Hit the endpoint to create the base two people in sandbox.familysearch.org
-//        pc.pushToWeb(ft, people.get(0));
-//        pc.pushToWeb(ft, people.get(1));
-        
-        //Hit the endpoint to create the couple relationship in sandbox.familysearch.org
-        //These two people must have had pushToWeb called so that they will have a Uri
-        //Otherwise the husband and wife PersonState objects will be null and no relationship will be made. 
-//        try {
-//            PersonState wife = ft.readPerson(basePerson.getPerson().getUri()).ifSuccessful();
-//            PersonState husband = ft.readPerson(baseSpouse.getPerson().getUri()).ifSuccessful();
-//            RelationshipState coupleRelationship = ft.addSpouseRelationship(husband, wife, reason("Starting couple")).ifSuccessful();
-//        } catch(Exception e) {
-//            e.printStackTrace();
-//        }
+
         
         createPerson(ft, true, "1", "September", "1900", "Eagle Point, Oregon", "1", "January", "2000", "Beaverton, Oregon", "This is simply a test");
         
-        
-        //Call the recursive function passing in the number of generations to create, the node to start with, 
-        //the Person creator to use, and the FamilySearchFamilyTree object to use for hitting the endpoint
-//        populateTree(2, basePerson, pc, ft);
         
         //Print out the names of all people in the newly created tree, their parents, and respective URI's to make it easy to find them in the tree
 //        printTree(basePerson);
@@ -276,6 +241,7 @@ public class TreeGenerator {
             System.out.println(person.getSelfUri());
             
             PersonState readPerson = ft.readPerson(person.getSelfUri());
+//            ft.readPersonById(given, options);
             System.out.println(readPerson.getName().getNameForms().get(0).getFullText());
             System.out.println(readPerson.getName().getNameForms().get(0).getParts().get(0).getValue());
             System.out.println(readPerson.getName().getNameForms().get(0).getParts().get(1).getValue());
@@ -295,6 +261,49 @@ public class TreeGenerator {
         return personMap;
     }
     
+    /**
+     * 
+     * @param ft FamilySearchFamilyTree for authenticating
+     * @param numGen the number of generations to create; 6 generations takes about 13 minutes because it has to wait for the api
+     */
+    public void startPopulateTree(FamilySearchFamilyTree ft, int numGen) {
+        //This instantiates a peron creator object which deals with PersonInfo objects and 
+        //encapsulates methods from the FamilySearch SDK that is being used.
+        PersonCreator pc = new PersonCreator();
+        //Make the initial person and spouse
+        pc.createPerson("Girlsname", "LastName", "Female", "3", "Apr", "1836", "Eagle Point, Oregon", "7", "February", "1900", "Beaverton, Oregon", "This is the starting person" );
+        pc.createPerson("Edward", "Banks", "Male", "3", "Apr", "1836", "Eagle Point, Oregon", "7", "February", "1900", "Beaverton, Oregon", "This is the starting spouse" );
+        
+        List<PersonInfo> people = pc.getPersons();
+        
+        //Create a nodes for the two starting people so that we can create a recursive function
+        //to make new generations
+        TreeNode basePerson = new TreeNode(people.get(0));
+        TreeNode baseSpouse = new TreeNode(people.get(1));
+        basePerson.setSpouse(baseSpouse);
+        baseSpouse.setSpouse(basePerson);
+        
+        
+        
+        //Hit the endpoint to create the base two people in sandbox.familysearch.org
+        pc.pushToWeb(ft, people.get(0));
+        pc.pushToWeb(ft, people.get(1));
+        
+        //Hit the endpoint to create the couple relationship in sandbox.familysearch.org
+        //These two people must have had pushToWeb called so that they will have a Uri
+        //Otherwise the husband and wife PersonState objects will be null and no relationship will be made. 
+        try {
+            PersonState wife = ft.readPerson(basePerson.getPerson().getUri()).ifSuccessful();
+            PersonState husband = ft.readPerson(baseSpouse.getPerson().getUri()).ifSuccessful();
+            RelationshipState coupleRelationship = ft.addSpouseRelationship(husband, wife, reason("Starting couple")).ifSuccessful();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        
+        //Call the recursive function passing in the number of generations to create, the node to start with, 
+        //the Person creator to use, and the FamilySearchFamilyTree object to use for hitting the endpoint
+        populateTree(numGen, basePerson, pc, ft);
+    }
     
     /**
      * Recursively generates a pedigree, given a person to start with and the number of generations to run
